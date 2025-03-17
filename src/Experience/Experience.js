@@ -10,6 +10,7 @@ import Environment from "./World/Environment.js"
 import Mouse from "./Utils/Mouse.js"
 import Raycasting from "./Utils/Raycasting.js"
 import EventManager from "./Utils/EventManager.js"
+import PostProcessing from "./Utils/PostProcessing.js"
 
 let instance = null
 
@@ -38,10 +39,10 @@ export default class Experience {
         // this.resources = new Resources(sources)
         this.camera = new Camera()
         this.renderer = new Renderer()
+        this.postProcessing = new PostProcessing()
         this.environment = new Environment()
         this.world = new World()
         this.raycaster = new Raycasting()
-
 
         // Resize event
         this.sizes.on("resize", () => {
@@ -57,13 +58,21 @@ export default class Experience {
 
     resize() {
         this.camera.resize()
-        this.renderer.resize()
+        if (this.postProcessing.active) {
+            this.postProcessing.resize()
+        } else {
+            this.renderer.resize()
+        }
     }
 
     update() {
         this.camera.update()
         this.world.update()
-        this.renderer.update()
+        if (this.postProcessing.active) {
+            this.postProcessing.update()
+        } else {
+            this.renderer.update()
+        }
         this.raycaster.update()
     }
 
@@ -71,26 +80,21 @@ export default class Experience {
         this.sizes.off("resize")
         this.time.off("tick")
 
-        // Traverse the whole scene
         this.scene.traverse((child) => {
-            // Test if it's a mesh
             if (child instanceof THREE.Mesh) {
                 child.geometry.dispose()
-
-                // Loop through the material properties
-                for (const key in child.material) {
-                    const value = child.material[key]
-
-                    // Test if there is a dispose function
+                Object.values(child.material).forEach(value => {
                     if (value && typeof value.dispose === "function") {
                         value.dispose()
                     }
-                }
+                })
             }
         })
 
+
         this.camera.controls.dispose()
         this.renderer.instance.dispose()
+        this.postProcessing.effectComposer.dispose()
 
         if (this.debug.active)
             this.debug.ui.destroy()
