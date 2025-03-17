@@ -3,8 +3,6 @@ import Experience from "../Experience.js"
 import vertexShader from "../shaders/vertex.glsl"
 import fragmentShader from "../shaders/fragment.glsl"
 
-console.log(fragmentShader)
-
 export default class Shape {
     constructor({
                     name = "Shape",
@@ -118,8 +116,8 @@ export default class Shape {
         this.debugFolder.add(this.mesh.scale, "z", 0.1, 3, 0.01).name("Scale Z").listen()
 
         // Color Picker
-        this.debugFolder.addColor(this.uniforms.uColor, "value").name("Color").onChange((value) => {
-            this.material.color.set(String(value))
+        this.debugFolder.addColor(this.uniforms.uColor, "value").name("Color").onChange((color) => {
+            this.material.color.set(new THREE.Color(color))
         })
 
         // Wireframe Toggle

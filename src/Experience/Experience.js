@@ -57,12 +57,10 @@ export default class Experience {
     setupInputHandling() {
         window.addEventListener("keydown", (event) => {
             this.keysPressed.add(event.key.toLowerCase())
-            console.log(this.keysPressed)
         })
 
         window.addEventListener("keyup", (event) => {
             this.keysPressed.delete(event.key.toLowerCase())
-            console.log(this.keysPressed)
         })
     }
 
