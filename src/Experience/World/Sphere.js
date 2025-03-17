@@ -1,21 +1,32 @@
-import * as THREE from "three"
 import Shape from "../Utils/Shape.js"
 
 export class Sphere extends Shape {
     constructor(params) {
         super(params)
-        this.speed = 0.05
-        this.keysPressed = this.experience.keysPressed
+        this.scales = this.mesh.scale.clone()
+
+
+        this.onClick = this.onClick.bind(this)
+        if (this.listenEvents) this.onEvents()
+    }
+
+    onClick() {
+        if (this.mesh.scale.equals(this.scales)) {
+            this.mesh.scale.set(4, 4, 4)
+        } else {
+            this.mesh.scale.copy(this.scales)
+        }
+    }
+
+    onEvents() {
+        this.on("click", this.onClick)
+    }
+
+    offEvents() {
+        this.off("click", this.onClick)
     }
 
     update() {
         super.update()
-
-        if (this.keysPressed.has(" ")) this.mesh.position.y += this.speed
-        if (this.keysPressed.has("shift")) this.mesh.position.y -= this.speed
-        if (this.keysPressed.has("q")) this.mesh.position.x -= this.speed
-        if (this.keysPressed.has("d")) this.mesh.position.x += this.speed
-        if (this.keysPressed.has("z")) this.mesh.position.z -= this.speed
-        if (this.keysPressed.has("s")) this.mesh.position.z += this.speed
     }
 }

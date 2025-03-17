@@ -2,8 +2,9 @@ import * as THREE from "three"
 import Experience from "../Experience.js"
 import vertexShader from "../shaders/vertex.glsl"
 import fragmentShader from "../shaders/fragment.glsl"
+import EventEmitter from "./EventEmitter.js"
 
-export default class Shape {
+export default class Shape extends EventEmitter {
     constructor({
                     name = "Shape",
                     type = "box",
@@ -15,14 +16,19 @@ export default class Shape {
                     useShader = false,
                     customShader = null,
                     uniforms = {},
+                    world = null,
+                    listenEvents = false,
                 }) {
+        super()
+
         this.name = name
         this.type = type
         this.experience = new Experience()
-        this.environment = this.experience.environment
         this.scene = this.experience.scene
-        this.debug = this.experience.debug
         this.time = this.experience.time
+        this.world = world
+
+        this.environment = this.experience.environment
 
         // Transform properties
         this.size = new THREE.Vector3().fromArray(size)
@@ -31,8 +37,8 @@ export default class Shape {
         this.scale = new THREE.Vector3().fromArray(scale)
 
         this.color = new THREE.Color(color)
+        this.isShaderMaterial = useShader
         this.shaders = customShader
-
 
         // Uniforms for shaders
         this.uniforms = {
@@ -46,13 +52,16 @@ export default class Shape {
 
         // Create shape
         this.createGeometry(this.type, this.size)
-        this.createMaterial(useShader, this.shaders, this.color)
+        this.createMaterial(this.isShaderMaterial, this.shaders, this.color)
         this.createMesh(this.position, this.rotation, this.scale)
 
         // Debug UI
-        if (this.debug.active) {
-            this.setDebugUI()
-        }
+        this.setDebugUI()
+
+        // Event
+        this.listenEvents = listenEvents
+
+        this.instance = this
     }
 
     createGeometry(type, size) {
@@ -94,11 +103,16 @@ export default class Shape {
         this.mesh.position.set(...position)
         this.mesh.rotation.copy(rotation)
         this.mesh.scale.copy(scale)
+    }
+
+    init() {
         this.scene.add(this.mesh)
     }
 
     setDebugUI() {
-        this.debugFolder = this.debug.ui.addFolder(this.name)
+        if (!this.experience.debug.active) return
+
+        this.debugFolder = this.experience.debug.ui.addFolder(this.name)
 
         // Position Controls
         this.debugFolder.add(this.mesh.position, "x", -5, 5, 0.01).name("Position X").listen()
@@ -111,19 +125,33 @@ export default class Shape {
         this.debugFolder.add(this.mesh.rotation, "z", -Math.PI, Math.PI, 0.01).name("Rotation Z").listen()
 
         // Scale Controls
-        this.debugFolder.add(this.mesh.scale, "x", 0.1, 3, 0.01).name("Scale X").listen()
-        this.debugFolder.add(this.mesh.scale, "y", 0.1, 3, 0.01).name("Scale Y").listen()
-        this.debugFolder.add(this.mesh.scale, "z", 0.1, 3, 0.01).name("Scale Z").listen()
+        this.debugFolder.add(this.mesh.scale, "x", 0.1, 5, 0.01).name("Scale X").listen()
+        this.debugFolder.add(this.mesh.scale, "y", 0.1, 5, 0.01).name("Scale Y").listen()
+        this.debugFolder.add(this.mesh.scale, "z", 0.1, 5, 0.01).name("Scale Z").listen()
 
         // Color Picker
-        this.debugFolder.addColor(this.uniforms.uColor, "value").name("Color").onChange((color) => {
-            this.material.color.set(new THREE.Color(color))
+        this.debugFolder.addColor(this, "color").name("Color").onChange((color) => {
+            const newColor = new THREE.Color(color)
+            if (this.isShaderMaterial) {
+                this.uniforms.uColor.value = newColor
+            } else {
+                this.material.color.set(newColor)
+            }
         })
+
+
+        // Material
+        if (!this.isShaderMaterial) {
+            this.debugFolder.add(this.material, "metalness", 0, 1, 0.01).name("Metalness").listen()
+            this.debugFolder.add(this.material, "roughness", 0, 1, 0.01).name("Roughness").listen()
+        }
+
 
         // Wireframe Toggle
         this.debugFolder.add(this.material, "wireframe").name("Wireframe")
 
     }
+
 
     update() {
         if (this.material instanceof THREE.ShaderMaterial) {
@@ -133,9 +161,12 @@ export default class Shape {
         }
     }
 
+
     destroy() {
         this.geometry.dispose()
         this.material.dispose()
         this.scene.remove(this.mesh)
     }
+
+
 }

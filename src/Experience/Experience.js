@@ -10,8 +10,12 @@ import Resources from "./Utils/Resources"
 
 import sources from "./sources"
 import Environment from "./World/Environment.js"
+import Mouse from "./Utils/Mouse.js"
+import Raycasting from "./Utils/Raycasting.js"
+import EventManager from "./Utils/EventManager.js"
 
 let instance = null
+
 
 export default class Experience {
     constructor(_canvas) {
@@ -27,11 +31,9 @@ export default class Experience {
         // Options
         this.canvas = _canvas
 
-        // Track pressed key
-        this.keysPressed = new Set()
-        this.setupInputHandling()
-
         // Setup
+        this.eventManager = new EventManager()
+        this.mouse = new Mouse()
         this.debug = new Debug()
         this.sizes = new Sizes()
         this.time = new Time()
@@ -41,7 +43,8 @@ export default class Experience {
         this.renderer = new Renderer()
         this.environment = new Environment()
         this.world = new World()
-
+        this.raycaster = new Raycasting()
+  
 
         // Resize event
         this.sizes.on("resize", () => {
@@ -54,15 +57,6 @@ export default class Experience {
         })
     }
 
-    setupInputHandling() {
-        window.addEventListener("keydown", (event) => {
-            this.keysPressed.add(event.key.toLowerCase())
-        })
-
-        window.addEventListener("keyup", (event) => {
-            this.keysPressed.delete(event.key.toLowerCase())
-        })
-    }
 
     resize() {
         this.camera.resize()
@@ -73,6 +67,7 @@ export default class Experience {
         this.camera.update()
         this.world.update()
         this.renderer.update()
+        this.raycaster.update()
     }
 
     destroy() {
