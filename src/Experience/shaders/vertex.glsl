@@ -6,7 +6,8 @@ varying vec3 vPosition;
 uniform float uTime;
 
 void main() {
-    vNormal = normalMatrix * normal;// Transform normal to world space
+    // Transform normal to world space
+    vNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
 
     // Apply animation to the position (make it move up/down)
     vec3 animatedPosition = position;
@@ -16,5 +17,5 @@ void main() {
     vPosition = (modelMatrix * vec4(animatedPosition, 1.0)).xyz;
 
     // Final position
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(animatedPosition, 1.0);
+    gl_Position = projectionMatrix * viewMatrix * vec4(vPosition, 1.0);
 }
