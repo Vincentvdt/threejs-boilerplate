@@ -6,9 +6,6 @@ import Time from "./Utils/Time"
 import Camera from "./Camera"
 import Renderer from "./Renderer"
 import World from "./World/World"
-import Resources from "./Utils/Resources"
-
-import sources from "./sources"
 import Environment from "./World/Environment.js"
 import Mouse from "./Utils/Mouse.js"
 import Raycasting from "./Utils/Raycasting.js"
@@ -44,7 +41,7 @@ export default class Experience {
         this.environment = new Environment()
         this.world = new World()
         this.raycaster = new Raycasting()
-  
+
 
         // Resize event
         this.sizes.on("resize", () => {
