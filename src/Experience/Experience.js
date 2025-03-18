@@ -40,6 +40,7 @@ export default class Experience {
         this.camera = new Camera()
         this.renderer = new Renderer()
         this.postProcessing = new PostProcessing()
+        this.postProcessing.off()
         this.environment = new Environment()
         this.world = new World()
         this.raycaster = new Raycasting()
