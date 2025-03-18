@@ -30,14 +30,14 @@ threejs-boilerplate/
 │   │   │-- shaders/             # GLSL shaders
 │   │   │-- Utils/               # Utility classes (debug, events, sizes, etc.)
 │   │   │-- World/               # 3D world elements
-│   │   │-- Camera.js            # Camera setup
-│   │   │-- Renderer.js          # Renderer setup
-│   │   │-- Experience.js        # Main experience class
-│   │   │-- Shape.js             # 3D Shape class
-│   │-- main.js                  # Entry point
+│   │   │-- Camera.ts            # Camera setup
+│   │   │-- Renderer.ts          # Renderer setup
+│   │   │-- Experience.ts        # Main experience class
+│   │   │-- Shape.ts             # 3D Shape class
+│   │-- main.ts                  # Entry point
 │-- index.html                   # HTML template
 │-- style.css                     # Global styles
-│-- vite.config.js                # Vite configuration
+│-- vite.config.ts                # Vite configuration
 │-- package.json                  # Dependencies and scripts
 ````
 
